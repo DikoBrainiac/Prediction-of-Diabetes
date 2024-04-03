@@ -14,7 +14,7 @@ import lightgbm as lgb
 from sklearn.ensemble import VotingClassifier
 
 # Load the dataset
-@st.cache
+@st.cache_data
 def load_data():
     df = pd.read_csv('diabetes_prediction_dataset.csv')
     return df
