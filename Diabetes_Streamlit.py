@@ -3,14 +3,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, cross_validate
-from sklearn.preprocessing import LabelEncoder, StandardScaler
 #from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, 
 from sklearn.metrics import confusion_matrix
 import lightgbm as lgb
-from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import VotingClassifier
 
 # Load the dataset
