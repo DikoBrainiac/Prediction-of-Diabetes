@@ -130,20 +130,21 @@ if show_preprocessing:
         if df[column].dtype == 'object':
             df[column] = label_encoder.fit_transform(df[column])
 
-    # Train-test split
+    # Balancing the response variable
     X = df.drop(['diabetes'], axis=1)
     y = df['diabetes']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    sm = SMOTE(sampling_strategy='minority', random_state=42)
+    X_resampled, y_resampled = sm.fit_resample(X, y)
+    df_resampled = pd.concat([X_resampled, y_resampled], axis=1)
+
+    # Train-test split
+    X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
 
     # Feature scaling
     scaler = StandardScaler()
-    X_train_scale = scaler.fit_transform(X_train)
-    X_train_scaled = pd.DataFrame(X_train_scale, columns=X_train.columns, index=X_train.index)
-
-    X_test_scale = scaler.transform(X_test)
-    X_test_scaled = pd.DataFrame(X_train_scale, columns=X_train.columns, index=X_train.index)
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
     
-
     st.write("Data Preprocessing Completed!")
 
 if show_model_training:
@@ -158,10 +159,6 @@ if show_model_training:
     et_clf = ExtraTreesClassifier(**params_et)
     lgb_clf = lgb.LGBMClassifier(**params_lgb)
     lr_clf = LogisticRegression(**params_lr)
-    
-    # Balancing the response variable
-    sm = SMOTE(sampling_strategy='minority', random_state=42)
-    X_train_resampled, y_train_resampled = sm.fit_resample(X_train_scaled, y_train)
 
     # Create the ensemble classifier
     ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft') # ('lgb', lgb_clf), ('lr', lr_clf)
