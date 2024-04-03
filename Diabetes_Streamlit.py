@@ -137,8 +137,11 @@ if show_preprocessing:
 
     # Feature scaling
     scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
+    X_train_scale = scaler.fit_transform(X_train)
+    X_train_scaled = pd.DataFrame(X_train_scale, columns=X_train.columns, index=X_train.index)
+
+    X_test_scale = scaler.transform(X_test)
+    X_test_scaled = pd.DataFrame(X_train_scale, columns=X_train.columns, index=X_train.index)
     
 
     st.write("Data Preprocessing Completed!")
