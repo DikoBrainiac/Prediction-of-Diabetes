@@ -140,9 +140,6 @@ if show_preprocessing:
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    # Balancing the response variable
-    sm = SMOTE(sampling_strategy='minority', random_state=42)
-    X_train_resampled, y_train_resampled = sm.fit_resample(X_train_scaled, y_train)
 
     st.write("Data Preprocessing Completed!")
 
@@ -162,7 +159,11 @@ if show_model_training:
     # Create the ensemble classifier
     ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft') # ('lgb', lgb_clf), ('lr', lr_clf)
 
+    # Balancing the response variable
+    sm = SMOTE(sampling_strategy='minority', random_state=42)
+    X_train_resampled, y_train_resampled = sm.fit_resample(X_train_scaled, y_train)
 
+    
     st.write("Models Trained Successfully!")
 
 
