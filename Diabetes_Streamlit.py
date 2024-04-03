@@ -173,7 +173,7 @@ if show_evaluation_metrics:
     scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
 
     # RandomForestClassifier
-    rf_scores = cross_validate(rf_clf, X_train_resampled, y_train_resampled, cv=10, scoring=scoring)
+    rf_scores = cross_validate(rf_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Random Forest Classifier Metrics:")
     # Display evaluation metrics
     for metric, score in rf_scores.items():
@@ -186,7 +186,7 @@ if show_evaluation_metrics:
     st.write(conf_matrix_rf)
 
     # ExtraTreesClassifier
-    et_scores = cross_validate(et_clf, X_train_resampled, y_train_resampled, cv=10, scoring=scoring)
+    et_scores = cross_validate(et_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Extra Trees Classifier Metrics:")
     # Display evaluation metrics
     for metric, score in et_scores.items():
@@ -199,7 +199,7 @@ if show_evaluation_metrics:
     st.write(conf_matrix_et)
 
     # LGBMClassifier
-    lgb_scores = cross_validate(lgb_clf, X_train_resampled, y_train_resampled, cv=10, scoring=scoring)
+    lgb_scores = cross_validate(lgb_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("LightGBM Classifier Metrics:")
     # Display evaluation metrics
     for metric, score in lgb_scores.items():
@@ -212,7 +212,7 @@ if show_evaluation_metrics:
     st.write(conf_matrix_lgb)
 
     # LogisticRegression
-    lr_scores = cross_validate(lr_clf, X_train_resampled, y_train_resampled, cv=10, scoring=scoring)
+    lr_scores = cross_validate(lr_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Logistic Regression Metrics:")
     # Display evaluation metrics
     for metric, score in lr_scores.items():
@@ -225,7 +225,7 @@ if show_evaluation_metrics:
     st.write(conf_matrix_lr)
 
     # Ensembled model
-    ensemble_clf_rf_et_scores = cross_validate(ensemble_clf_rf_et, X_train_resampled, y_train_resampled, cv=10, scoring=scoring)
+    ensemble_clf_rf_et_scores = cross_validate(ensemble_clf_rf_et, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Ensembled Model Metrics:")
     # Display evaluation metrics
     for metric, score in ensemble_clf_rf_et_scores.items():
