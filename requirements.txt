@@ -3,6 +3,6 @@ pandas
 numpy
 matplotlib
 seaborn
+imbalanced-learn
 scikit-learn
 lightgbm
-imbalanced-learn
