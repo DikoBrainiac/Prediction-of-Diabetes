@@ -156,12 +156,12 @@ if show_model_training:
     lgb_clf = lgb.LGBMClassifier(**params_lgb)
     lr_clf = LogisticRegression(**params_lr)
     
-    # Create the ensemble classifier
-    ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft') # ('lgb', lgb_clf), ('lr', lr_clf)
-
     # Balancing the response variable
     sm = SMOTE(sampling_strategy='minority', random_state=42)
     X_train_resampled, y_train_resampled = sm.fit_resample(X_train_scaled, y_train)
+
+    # Create the ensemble classifier
+    ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft') # ('lgb', lgb_clf), ('lr', lr_clf)
 
     
     st.write("Models Trained Successfully!")
