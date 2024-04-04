@@ -167,66 +167,61 @@ if show_preprocessing:
     # Evaluation metrics
     scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
 
-    # RandomForestClassifier
+    # Fit and evaluate RandomForestClassifier
+    rf_clf.fit(X_train_scaled, y_train)
     rf_scores = cross_validate(rf_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Random Forest Classifier Metrics:")
-    # Display evaluation metrics
     for metric, score in rf_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
-    # Confusion Matrix for RandomForestClassifier
     y_pred_rf = rf_clf.predict(X_test_scaled)
     conf_matrix_rf = confusion_matrix(y_test, y_pred_rf)
     st.write("Confusion Matrix for Random Forest Classifier:")
     st.write(conf_matrix_rf)
 
-    # ExtraTreesClassifier
+    # Fit and evaluate ExtraTreesClassifier
+    et_clf.fit(X_train_scaled, y_train)
     et_scores = cross_validate(et_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Extra Trees Classifier Metrics:")
-    # Display evaluation metrics
     for metric, score in et_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
-    # Confusion Matrix for ExtraTreesClassifier
     y_pred_et = et_clf.predict(X_test_scaled)
     conf_matrix_et = confusion_matrix(y_test, y_pred_et)
     st.write("Confusion Matrix for Extra Trees Classifier:")
     st.write(conf_matrix_et)
 
-    # LGBMClassifier
+    # Fit and evaluate LGBMClassifier
+    lgb_clf.fit(X_train_scaled, y_train)
     lgb_scores = cross_validate(lgb_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("LightGBM Classifier Metrics:")
-    # Display evaluation metrics
     for metric, score in lgb_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
-    # Confusion Matrix for LGBMClassifier
     y_pred_lgb = lgb_clf.predict(X_test_scaled)
     conf_matrix_lgb = confusion_matrix(y_test, y_pred_lgb)
     st.write("Confusion Matrix for LightGBM Classifier:")
     st.write(conf_matrix_lgb)
 
-    # LogisticRegression
+    # Fit and evaluate LogisticRegression
+    lr_clf.fit(X_train_scaled, y_train)
     lr_scores = cross_validate(lr_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Logistic Regression Metrics:")
-    # Display evaluation metrics
     for metric, score in lr_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
-    # Confusion Matrix for LogisticRegression
     y_pred_lr = lr_clf.predict(X_test_scaled)
     conf_matrix_lr = confusion_matrix(y_test, y_pred_lr)
     st.write("Confusion Matrix for Logistic Regression:")
     st.write(conf_matrix_lr)
 
-    # Ensembled model
+    # Fit and evaluate Ensembled model
+    ensemble_clf_rf_et.fit(X_train_scaled, y_train)
     ensemble_clf_rf_et_scores = cross_validate(ensemble_clf_rf_et, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Ensembled Model Metrics:")
-    # Display evaluation metrics
     for metric, score in ensemble_clf_rf_et_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
-    # Confusion Matrix for Ensembled Model
     y_pred_ensemble = ensemble_clf_rf_et.predict(X_test_scaled)
     conf_matrix_ensemble = confusion_matrix(y_test, y_pred_ensemble)
     st.write("Confusion Matrix for Ensembled Model:")
