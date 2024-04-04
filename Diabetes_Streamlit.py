@@ -147,7 +147,6 @@ if show_preprocessing:
     
     st.write("Data Preprocessing Completed!")
 
-if show_model_training:
     st.subheader("Model Training")
     # Model training
     params_rf = {'n_estimators': 100, 'random_state': 42}
