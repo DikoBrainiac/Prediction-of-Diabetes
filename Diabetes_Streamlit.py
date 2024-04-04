@@ -264,7 +264,6 @@ if show_preprocessing:
     plt.tight_layout()
     st.pyplot()
 
-if make_predictions:
     st.subheader("Make Predictions")
     st.write("Please input values for prediction:")
     age = st.number_input("Age", min_value=0, max_value=120, step=1)
