@@ -124,17 +124,17 @@ if show_preprocessing:
                 df[column] = np.where(df[column] < lower_quantile, lower_quantile, df[column])
                 df[column] = np.where(df[column] > upper_quantile, upper_quantile, df[column])
 
+    # Label encoding for categorical variables
+    label_encoder = LabelEncoder()
+    for column in df.columns:
+        if df[column].dtype == 'object':
+            df[column] = label_encoder.fit_transform(df[column])
+
     # Balancing the response variable using SMOTE
     sm = SMOTE(sampling_strategy='minority', random_state=42)
     X_resampled, y_resampled = sm.fit_resample(df.drop(['diabetes'], axis=1), df['diabetes'])
     df_resampled = pd.concat([X_resampled, y_resampled], axis=1)
-
-    # Label encoding for categorical variables
-    label_encoder = LabelEncoder()
-    for column in df_resampled.columns:
-        if df_resampled[column].dtype == 'object':
-            df_resampled[column] = label_encoder.fit_transform(df_resampled[column])
-
+    
     # Train-test split
     X = df_resampled.drop(['diabetes'], axis=1)
     y = df_resampled['diabetes']
