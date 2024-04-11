@@ -172,12 +172,11 @@ class DiabetesPredictionApp:
         # Train-test split
         X = df_resampled.drop(['diabetes'], axis=1)
         y = df_resampled['diabetes']
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         # Feature scaling
-        scaler = StandardScaler()
-        self.X_train_scaled = scaler.fit_transform(X_train)
-        self.X_test_scaled = scaler.transform(X_test)
+        self.X_train_scaled = self.scaler.fit_transform(self.X_train)
+        self.X_test_scaled = self.scaler.transform(self.X_test)
 
         st.write("Data Preprocessing Completed!")
         pass
