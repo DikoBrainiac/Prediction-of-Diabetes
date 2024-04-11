@@ -27,7 +27,7 @@ class DiabetesPredictionApp:
         self.ensemble_clf_rf_et = None
 
     @staticmethod
-    @st.cache
+    @st.cache_data
     def load_data():
         return pd.read_csv('diabetes_prediction_dataset.csv')
 
