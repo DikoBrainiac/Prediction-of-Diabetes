@@ -169,6 +169,7 @@ class DiabetesPredictionApp:
         X_resampled, y_resampled = sm.fit_resample(self.df.drop(['diabetes'], axis=1), self.df['diabetes'])
         df_resampled = pd.concat([X_resampled, y_resampled], axis=1)
         
+        
         # Train-test split
         X = df_resampled.drop(['diabetes'], axis=1)
         y = df_resampled['diabetes']
@@ -181,7 +182,7 @@ class DiabetesPredictionApp:
         st.write("Data Preprocessing Completed!")
         pass
 
-   def train_models(self):
+    def train_models(self):
         # Model training
         params_rf = {'n_estimators': 100, 'random_state': 42}
         params_et = {'n_estimators': 100, 'random_state': 42}
