@@ -3,14 +3,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import LabelEncoder, StandardScaler
-from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 #from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, 
 from sklearn.metrics import confusion_matrix
 import lightgbm as lgb
+from imblearn.over_sampling import SMOTE
 from sklearn.ensemble import VotingClassifier
 
 # Load the dataset
@@ -124,29 +124,30 @@ if show_preprocessing:
                 df[column] = np.where(df[column] < lower_quantile, lower_quantile, df[column])
                 df[column] = np.where(df[column] > upper_quantile, upper_quantile, df[column])
 
-    # Label encoding for categorical variables
-    label_encoder = LabelEncoder()
-    for column in df.columns:
-        if df[column].dtype == 'object':
-            df[column] = label_encoder.fit_transform(df[column])
-
-    # Balancing the response variable
-    X = df.drop(['diabetes'], axis=1)
-    y = df['diabetes']
+    # Balancing the response variable using SMOTE
     sm = SMOTE(sampling_strategy='minority', random_state=42)
-    X_resampled, y_resampled = sm.fit_resample(X, y)
+    X_resampled, y_resampled = sm.fit_resample(df.drop(['diabetes'], axis=1), df['diabetes'])
     df_resampled = pd.concat([X_resampled, y_resampled], axis=1)
 
+    # Label encoding for categorical variables
+    label_encoder = LabelEncoder()
+    for column in df_resampled.columns:
+        if df_resampled[column].dtype == 'object':
+            df_resampled[column] = label_encoder.fit_transform(df_resampled[column])
+
     # Train-test split
-    X_train, X_test, y_train, y_test = train_test_split(X_resampled, y_resampled, test_size=0.2, random_state=42)
+    X = df_resampled.drop(['diabetes'], axis=1)
+    y = df_resampled['diabetes']
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Feature scaling
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
-    
+
     st.write("Data Preprocessing Completed!")
 
+if show_model_training:
     st.subheader("Model Training")
     # Model training
     params_rf = {'n_estimators': 100, 'random_state': 42}
@@ -159,69 +160,85 @@ if show_preprocessing:
     lgb_clf = lgb.LGBMClassifier(**params_lgb)
     lr_clf = LogisticRegression(**params_lr)
 
+    # Fit the models
+    rf_clf.fit(X_train_scaled, y_train)
+    et_clf.fit(X_train_scaled, y_train)
+    lgb_clf.fit(X_train_scaled, y_train)
+    lr_clf.fit(X_train_scaled, y_train)
+
     # Create the ensemble classifier
-    ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft') # ('lgb', lgb_clf), ('lr', lr_clf)
+    ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft')
+    
+    # Fit the ensemble classifier
+    ensemble_clf_rf_et.fit(X_train_scaled, y_train)
 
     st.write("Models Trained Successfully!")
 
+if show_evaluation_metrics:
+    st.subheader("Evaluation Metrics")
     # Evaluation metrics
     scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
 
-    # Fit and evaluate RandomForestClassifier
-    rf_clf.fit(X_train_scaled, y_train)
+    # RandomForestClassifier
     rf_scores = cross_validate(rf_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Random Forest Classifier Metrics:")
+    # Display evaluation metrics
     for metric, score in rf_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
+    # Confusion Matrix for RandomForestClassifier
     y_pred_rf = rf_clf.predict(X_test_scaled)
     conf_matrix_rf = confusion_matrix(y_test, y_pred_rf)
     st.write("Confusion Matrix for Random Forest Classifier:")
     st.write(conf_matrix_rf)
 
-    # Fit and evaluate ExtraTreesClassifier
-    et_clf.fit(X_train_scaled, y_train)
+    # ExtraTreesClassifier
     et_scores = cross_validate(et_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Extra Trees Classifier Metrics:")
+    # Display evaluation metrics
     for metric, score in et_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
+    # Confusion Matrix for ExtraTreesClassifier
     y_pred_et = et_clf.predict(X_test_scaled)
     conf_matrix_et = confusion_matrix(y_test, y_pred_et)
     st.write("Confusion Matrix for Extra Trees Classifier:")
     st.write(conf_matrix_et)
 
-    # Fit and evaluate LGBMClassifier
-    lgb_clf.fit(X_train_scaled, y_train)
+    # LGBMClassifier
     lgb_scores = cross_validate(lgb_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("LightGBM Classifier Metrics:")
+    # Display evaluation metrics
     for metric, score in lgb_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
+    # Confusion Matrix for LGBMClassifier
     y_pred_lgb = lgb_clf.predict(X_test_scaled)
     conf_matrix_lgb = confusion_matrix(y_test, y_pred_lgb)
     st.write("Confusion Matrix for LightGBM Classifier:")
     st.write(conf_matrix_lgb)
 
-    # Fit and evaluate LogisticRegression
-    lr_clf.fit(X_train_scaled, y_train)
+    # LogisticRegression
     lr_scores = cross_validate(lr_clf, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Logistic Regression Metrics:")
+    # Display evaluation metrics
     for metric, score in lr_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
+    # Confusion Matrix for LogisticRegression
     y_pred_lr = lr_clf.predict(X_test_scaled)
     conf_matrix_lr = confusion_matrix(y_test, y_pred_lr)
     st.write("Confusion Matrix for Logistic Regression:")
     st.write(conf_matrix_lr)
 
-    # Fit and evaluate Ensembled model
-    ensemble_clf_rf_et.fit(X_train_scaled, y_train)
+    # Ensembled model
     ensemble_clf_rf_et_scores = cross_validate(ensemble_clf_rf_et, X_train_scaled, y_train, cv=10, scoring=scoring)
     st.write("Ensembled Model Metrics:")
+    # Display evaluation metrics
     for metric, score in ensemble_clf_rf_et_scores.items():
         st.write(f"{metric}: {np.mean(score):.4f}")
 
+    # Confusion Matrix for Ensembled Model
     y_pred_ensemble = ensemble_clf_rf_et.predict(X_test_scaled)
     conf_matrix_ensemble = confusion_matrix(y_test, y_pred_ensemble)
     st.write("Confusion Matrix for Ensembled Model:")
@@ -264,6 +281,8 @@ if show_preprocessing:
     plt.tight_layout()
     st.pyplot()
 
+
+if make_predictions:
     st.subheader("Make Predictions")
     st.write("Please input values for prediction:")
     age = st.number_input("Age", min_value=0, max_value=120, step=1)
