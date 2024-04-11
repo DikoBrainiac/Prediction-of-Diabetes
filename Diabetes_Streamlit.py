@@ -182,6 +182,18 @@ class DiabetesPredictionApp:
         pass
     
     def train_models(self):
+        
+        # Debugging code
+        st.write("Debugging: Checking shapes and sample values of X_train, y_train, X_test, y_test")
+        st.write("X_train shape:", self.X_train_scaled.shape)
+        st.write("y_train shape:", self.y_train.shape)
+        st.write("X_test shape:", self.X_test_scaled.shape)
+        st.write("y_test shape:", self.y_test.shape)
+        st.write("Sample values of X_train:", self.X_train_scaled[:5])
+        st.write("Sample values of y_train:", self.y_train[:5])
+        st.write("Sample values of X_test:", self.X_test_scaled[:5])
+        st.write("Sample values of y_test:", self.y_test[:5])
+    
         # Model training
         params_rf = {'n_estimators': 100, 'random_state': 42}
         params_et = {'n_estimators': 100, 'random_state': 42}
