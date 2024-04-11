@@ -202,16 +202,12 @@ class DiabetesPredictionApp:
     
     def train_models(self):
         
-        # Debugging code
-        st.write("Debugging: Checking shapes and sample values of X_train, y_train, X_test, y_test")
-        st.write("X_train shape:", self.X_train_scaled.shape)
-        st.write("y_train shape:", self.y_train.shape)
-        st.write("X_test shape:", self.X_test_scaled.shape)
-        st.write("y_test shape:", self.y_test.shape)
-        st.write("Sample values of X_train:", self.X_train_scaled[:5])
-        st.write("Sample values of y_train:", self.y_train[:5])
-        st.write("Sample values of X_test:", self.X_test_scaled[:5])
-        st.write("Sample values of y_test:", self.y_test[:5])
+        # Debugging: Checking attribute assignment before fitting the models...
+        st.write("Debugging: Checking attribute assignment before fitting the models...")
+        st.write("X_train_scaled:", self.X_train_scaled)
+        st.write("y_train:", self.y_train)
+        st.write("X_test_scaled:", self.X_test_scaled)
+        st.write("y_test:", self.y_test)
     
         # Model training
         params_rf = {'n_estimators': 100, 'random_state': 42}
@@ -232,7 +228,7 @@ class DiabetesPredictionApp:
     
         # Create the ensemble classifier
         self.ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', self.rf_clf), ('et', self.et_clf)], voting='soft')
-        
+    
         # Fit the ensemble classifier
         self.ensemble_clf_rf_et.fit(self.X_train_scaled, self.y_train)
     
