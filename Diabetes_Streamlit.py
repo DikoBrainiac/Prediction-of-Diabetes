@@ -121,7 +121,7 @@ class DiabetesPredictionApp:
         missing_values = self.df.isna().sum()
         st.write("Missing Values:")
         st.write(missing_values)
-
+    
         # Handling missing values
         replace_missing = st.selectbox("Replace missing values with:", ['Mean', 'Median', 'Mode', 'Remove'])
         if replace_missing != 'Remove':
@@ -141,7 +141,7 @@ class DiabetesPredictionApp:
                         self.df[column].fillna(mode_val, inplace=True)
         else:
             self.df.dropna(inplace=True)
-
+    
         # Outlier treatment
         outlier_action = st.selectbox("Outlier Treatment:", ['Remove', 'Replace with Mean', 'Replace with Median', 'Replace with Lower/Upper Quantile'])
         if outlier_action != 'Remove':
@@ -157,19 +157,18 @@ class DiabetesPredictionApp:
                     upper_quantile = self.df[column].quantile(0.75)
                     self.df[column] = np.where(self.df[column] < lower_quantile, lower_quantile, self.df[column])
                     self.df[column] = np.where(self.df[column] > upper_quantile, upper_quantile, self.df[column])
-
+    
         # Label encoding for categorical variables
         label_encoder = LabelEncoder()
         for column in self.df.columns:
             if self.df[column].dtype == 'object':
                 self.df[column] = label_encoder.fit_transform(self.df[column])
-
+    
         # Balancing the response variable using SMOTE
         sm = SMOTE(sampling_strategy='minority', random_state=42)
         X_resampled, y_resampled = sm.fit_resample(self.df.drop(['diabetes'], axis=1), self.df['diabetes'])
         df_resampled = pd.concat([X_resampled, y_resampled], axis=1)
-        
-        
+    
         # Train-test split
         X = df_resampled.drop(['diabetes'], axis=1)
         y = df_resampled['diabetes']
@@ -178,34 +177,34 @@ class DiabetesPredictionApp:
         # Feature scaling
         self.X_train_scaled = self.scaler.fit_transform(self.X_train)
         self.X_test_scaled = self.scaler.transform(self.X_test)
-
+    
         st.write("Data Preprocessing Completed!")
         pass
-
+    
     def train_models(self):
         # Model training
         params_rf = {'n_estimators': 100, 'random_state': 42}
         params_et = {'n_estimators': 100, 'random_state': 42}
         params_lgb = {'n_estimators': 100, 'random_state': 42}
         params_lr = {'random_state': 42}
-
+    
         self.rf_clf = RandomForestClassifier(**params_rf)
         self.et_clf = ExtraTreesClassifier(**params_et)
         self.lgb_clf = lgb.LGBMClassifier(**params_lgb)
         self.lr_clf = LogisticRegression(**params_lr)
-
+    
         # Fit the models
         self.rf_clf.fit(self.X_train_scaled, self.y_train)
         self.et_clf.fit(self.X_train_scaled, self.y_train)
         self.lgb_clf.fit(self.X_train_scaled, self.y_train)
         self.lr_clf.fit(self.X_train_scaled, self.y_train)
-
+    
         # Create the ensemble classifier
         self.ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', self.rf_clf), ('et', self.et_clf)], voting='soft')
         
         # Fit the ensemble classifier
         self.ensemble_clf_rf_et.fit(self.X_train_scaled, self.y_train)
-
+    
         st.write("Models Trained Successfully!")
         pass
 
