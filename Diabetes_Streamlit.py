@@ -181,29 +181,29 @@ class DiabetesPredictionApp:
         st.write("Data Preprocessing Completed!")
         pass
 
-    def train_models(self):
+   def train_models(self):
         # Model training
         params_rf = {'n_estimators': 100, 'random_state': 42}
         params_et = {'n_estimators': 100, 'random_state': 42}
         params_lgb = {'n_estimators': 100, 'random_state': 42}
         params_lr = {'random_state': 42}
 
-        rf_clf = RandomForestClassifier(**params_rf)
-        et_clf = ExtraTreesClassifier(**params_et)
-        lgb_clf = lgb.LGBMClassifier(**params_lgb)
-        lr_clf = LogisticRegression(**params_lr)
+        self.rf_clf = RandomForestClassifier(**params_rf)
+        self.et_clf = ExtraTreesClassifier(**params_et)
+        self.lgb_clf = lgb.LGBMClassifier(**params_lgb)
+        self.lr_clf = LogisticRegression(**params_lr)
 
         # Fit the models
-        rf_clf.fit(self.X_train_scaled, self.y_train)
-        et_clf.fit(self.X_train_scaled, self.y_train)
-        lgb_clf.fit(self.X_train_scaled, self.y_train)
-        lr_clf.fit(self.X_train_scaled, self.y_train)
+        self.rf_clf.fit(self.X_train_scaled, self.y_train)
+        self.et_clf.fit(self.X_train_scaled, self.y_train)
+        self.lgb_clf.fit(self.X_train_scaled, self.y_train)
+        self.lr_clf.fit(self.X_train_scaled, self.y_train)
 
         # Create the ensemble classifier
-        ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', rf_clf), ('et', et_clf)], voting='soft')
+        self.ensemble_clf_rf_et = VotingClassifier(estimators=[('rf', self.rf_clf), ('et', self.et_clf)], voting='soft')
         
         # Fit the ensemble classifier
-        ensemble_clf_rf_et.fit(self.X_train_scaled, self.y_train)
+        self.ensemble_clf_rf_et.fit(self.X_train_scaled, self.y_train)
 
         st.write("Models Trained Successfully!")
         pass
