@@ -117,6 +117,11 @@ class DiabetesPredictionApp:
         pass
 
     def preprocess_data(self):
+        # Add debugging statements to check data preprocessing steps
+        st.write("Debugging: Checking data preprocessing steps...")
+        st.write("Original DataFrame:")
+        st.write(self.df.head())
+    
         # Checking missing values
         missing_values = self.df.isna().sum()
         st.write("Missing Values:")
@@ -177,6 +182,20 @@ class DiabetesPredictionApp:
         # Feature scaling
         self.X_train_scaled = self.scaler.fit_transform(self.X_train)
         self.X_test_scaled = self.scaler.transform(self.X_test)
+        
+        # Check train-test split
+        st.write("Debugging: Checking train-test split...")
+        st.write("X_train shape:", self.X_train_scaled.shape)
+        st.write("y_train shape:", self.y_train.shape)
+        st.write("X_test shape:", self.X_test_scaled.shape)
+        st.write("y_test shape:", self.y_test.shape)
+    
+        # Confirm attribute assignment
+        st.write("Debugging: Checking attribute assignment...")
+        st.write("X_train_scaled:", self.X_train_scaled)
+        st.write("y_train:", self.y_train)
+        st.write("X_test_scaled:", self.X_test_scaled)
+        st.write("y_test:", self.y_test)
     
         st.write("Data Preprocessing Completed!")
         pass
