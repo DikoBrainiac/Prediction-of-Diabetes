@@ -133,17 +133,17 @@ class DiabetesPredictionApp:
             for column in self.df.columns:
                 if self.df[column].dtype == 'object':
                     mode_val = self.df[column].mode()[0]
-                    self.df[column].fillna(mode_val, inplace=True)
+                    self.df.fillna({column: mode_val}, inplace=True)
                 else:
                     if replace_missing == 'Mean':
                         mean_val = self.df[column].mean()
-                        self.df[column].fillna(mean_val, inplace=True)
+                        self.df[column] = self.df[column].fillna(mean_val)
                     elif replace_missing == 'Median':
                         median_val = self.df[column].median()
-                        self.df[column].fillna(median_val, inplace=True)
+                        self.df[column] = self.df[column].fillna(median_val)
                     else:  # Mode
                         mode_val = self.df[column].mode()[0]
-                        self.df[column].fillna(mode_val, inplace=True)
+                        self.df.fillna({column: mode_val}, inplace=True)
         else:
             self.df.dropna(inplace=True)
     
