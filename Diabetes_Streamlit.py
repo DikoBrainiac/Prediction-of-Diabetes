@@ -3,14 +3,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import confusion_matrix
 import lightgbm as lgb
 from imblearn.over_sampling import SMOTE
-from sklearn.ensemble import VotingClassifier
 
 class DiabetesPredictionApp:
     def __init__(self):
@@ -62,13 +61,22 @@ class DiabetesPredictionApp:
             self.preprocess_data()
 
         if self.show_model_training:
-            self.train_models()
+            if self.X_train_scaled is not None and self.y_train is not None:
+                self.train_models()
+            else:
+                st.warning("Please preprocess the data first.")
 
         if self.show_evaluation_metrics:
-            self.evaluate_models()
+            if self.X_test_scaled is not None and self.y_test is not None:
+                self.evaluate_models()
+            else:
+                st.warning("Please preprocess the data and train the models first.")
 
         if self.make_predictions:
-            self.predict()
+            if self.X_test_scaled is not None:
+                self.predict()
+            else:
+                st.warning("Please preprocess the data and train the models first.")
 
     def view_dataset(self):
         st.subheader("Dataset")
@@ -114,7 +122,6 @@ class DiabetesPredictionApp:
             plt.ylabel("Values")
             plt.xticks(rotation=45)
             st.pyplot()
-        pass
 
     def preprocess_data(self):
         # Add debugging statements to check data preprocessing steps
@@ -190,13 +197,6 @@ class DiabetesPredictionApp:
         st.write("X_test_scaled:", self.X_test_scaled.shape)
         st.write("y_test:", self.y_test.shape)
     
-        # Confirm attribute assignment
-        st.write("Debugging: Checking attribute assignment...")
-        st.write("X_train_scaled:", self.X_train_scaled)
-        st.write("y_train:", self.y_train)
-        st.write("X_test_scaled:", self.X_test_scaled)
-        st.write("y_test:", self.y_test)
-    
         st.write("Data Preprocessing Completed!")
         pass
     
@@ -236,143 +236,31 @@ class DiabetesPredictionApp:
         pass
 
     def evaluate_models(self):
-        # Evaluation metrics
-        scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
-
-        # RandomForestClassifier
-        rf_scores = cross_validate(self.rf_clf, self.X_train_scaled, self.y_train, cv=10, scoring=scoring)
-        st.write("Random Forest Classifier Metrics:")
-        # Display evaluation metrics
-        for metric, score in rf_scores.items():
-            st.write(f"{metric}: {np.mean(score):.4f}")
-
-        # Confusion Matrix for RandomForestClassifier
-        y_pred_rf = self.rf_clf.predict(self.X_test_scaled)
-        conf_matrix_rf = confusion_matrix(self.y_test, y_pred_rf)
-        st.write("Confusion Matrix for Random Forest Classifier:")
-        st.write(conf_matrix_rf)
-
-        # ExtraTreesClassifier
-        et_scores = cross_validate(self.et_clf, self.X_train_scaled, self.y_train, cv=10, scoring=scoring)
-        st.write("Extra Trees Classifier Metrics:")
-        # Display evaluation metrics
-        for metric, score in et_scores.items():
-            st.write(f"{metric}: {np.mean(score):.4f}")
-
-        # Confusion Matrix for ExtraTreesClassifier
-        y_pred_et = self.et_clf.predict(self.X_test_scaled)
-        conf_matrix_et = confusion_matrix(self.y_test, y_pred_et)
-        st.write("Confusion Matrix for Extra Trees Classifier:")
-        st.write(conf_matrix_et)
-
-        # LGBMClassifier
-        lgb_scores = cross_validate(self.lgb_clf, self.X_train_scaled, self.y_train, cv=10, scoring=scoring)
-        st.write("LightGBM Classifier Metrics:")
-        # Display evaluation metrics
-        for metric, score in lgb_scores.items():
-            st.write(f"{metric}: {np.mean(score):.4f}")
-
-        # Confusion Matrix for LGBMClassifier
-        y_pred_lgb = self.lgb_clf.predict(self.X_test_scaled)
-        conf_matrix_lgb = confusion_matrix(self.y_test, y_pred_lgb)
-        st.write("Confusion Matrix for LightGBM Classifier:")
-        st.write(conf_matrix_lgb)
-
-        # LogisticRegression
-        lr_scores = cross_validate(self.lr_clf, self.X_train_scaled, self.y_train, cv=10, scoring=scoring)
-        st.write("Logistic Regression Metrics:")
-        # Display evaluation metrics
-        for metric, score in lr_scores.items():
-            st.write(f"{metric}: {np.mean(score):.4f}")
-
-        # Confusion Matrix for LogisticRegression
-        y_pred_lr = self.lr_clf.predict(self.X_test_scaled)
-        conf_matrix_lr = confusion_matrix(self.y_test, y_pred_lr)
-        st.write("Confusion Matrix for Logistic Regression:")
-        st.write(conf_matrix_lr)
-
-        # Ensembled model
-        ensemble_clf_rf_et_scores = cross_validate(self.ensemble_clf_rf_et, self.X_train_scaled, self.y_train, cv=10, scoring=scoring)
-        st.write("Ensembled Model Metrics:")
-        # Display evaluation metrics
-        for metric, score in ensemble_clf_rf_et_scores.items():
-            st.write(f"{metric}: {np.mean(score):.4f}")
-
-        # Confusion Matrix for Ensembled Model
-        y_pred_ensemble = self.ensemble_clf_rf_et.predict(self.X_test_scaled)
-        conf_matrix_ensemble = confusion_matrix(self.y_test, y_pred_ensemble)
-        st.write("Confusion Matrix for Ensembled Model:")
-        st.write(conf_matrix_ensemble)
-
-        # Visualization of Confusion Matrices
-        st.subheader("Confusion Matrix Visualizations")
-        plt.figure(figsize=(12, 10))
-
-        plt.subplot(3, 2, 1)
-        sns.heatmap(conf_matrix_rf, annot=True, cmap="Blues", fmt="d", xticklabels=['No Diabetes', 'Diabetes'], yticklabels=['No Diabetes', 'Diabetes'])
-        plt.title("Random Forest Classifier")
-        plt.xlabel("Predicted")
-        plt.ylabel("True")
-
-        plt.subplot(3, 2, 2)
-        sns.heatmap(conf_matrix_et, annot=True, cmap="Blues", fmt="d", xticklabels=['No Diabetes', 'Diabetes'], yticklabels=['No Diabetes', 'Diabetes'])
-        plt.title("Extra Trees Classifier")
-        plt.xlabel("Predicted")
-        plt.ylabel("True")
-
-        plt.subplot(3, 2, 3)
-        sns.heatmap(conf_matrix_lgb, annot=True, cmap="Blues", fmt="d", xticklabels=['No Diabetes', 'Diabetes'], yticklabels=['No Diabetes', 'Diabetes'])
-        plt.title("LightGBM Classifier")
-        plt.xlabel("Predicted")
-        plt.ylabel("True")
-
-        plt.subplot(3, 2, 4)
-        sns.heatmap(conf_matrix_lr, annot=True, cmap="Blues", fmt="d", xticklabels=['No Diabetes', 'Diabetes'], yticklabels=['No Diabetes', 'Diabetes'])
-        plt.title("Logistic Regression")
-        plt.xlabel("Predicted")
-        plt.ylabel("True")
-
-        plt.subplot(3, 2, 5)
-        sns.heatmap(conf_matrix_ensemble, annot=True, cmap="Blues", fmt="d", xticklabels=['No Diabetes', 'Diabetes'], yticklabels=['No Diabetes', 'Diabetes'])
-        plt.title("Ensembled Model")
-        plt.xlabel("Predicted")
-        plt.ylabel("True")
-
-        plt.tight_layout()
-        st.pyplot()
-        pass
+        # Evaluate models
+        st.write("Evaluating Models...")
+        models = {
+            "Random Forest": self.rf_clf,
+            "Extra Trees": self.et_clf,
+            "LightGBM": self.lgb_clf,
+            "Logistic Regression": self.lr_clf,
+            "Ensemble (RF + ET)": self.ensemble_clf_rf_et
+        }
+        for name, model in models.items():
+            scores = cross_validate(model, self.X_test_scaled, self.y_test, cv=5, scoring=['accuracy', 'precision', 'recall', 'f1'])
+            st.write(f"Model: {name}")
+            st.write("Accuracy:", np.mean(scores['test_accuracy']))
+            st.write("Precision:", np.mean(scores['test_precision']))
+            st.write("Recall:", np.mean(scores['test_recall']))
+            st.write("F1 Score:", np.mean(scores['test_f1']))
+            st.write("Confusion Matrix:")
+            y_pred = model.predict(self.X_test_scaled)
+            cm = confusion_matrix(self.y_test, y_pred)
+            st.write(cm)
 
     def predict(self):
-        st.write("Please input values for prediction:")
-        age = st.number_input("Age", min_value=0, max_value=120, step=1)
-        bmi = st.number_input("BMI", min_value=0.0, max_value=60.0, step=0.1)
-        hbA1c_level = st.number_input("HbA1c Level", min_value=0.0, max_value=20.0, step=0.1)
-        blood_glucose_level = st.number_input("Blood Glucose Level", min_value=0.0, max_value=600.0, step=1.0)
-        gender = st.selectbox("Gender", ['Male', 'Female'])
-        hypertension = st.selectbox("Hypertension", ['Yes', 'No'])
-        heart_disease = st.selectbox("Heart Disease", ['Yes', 'No'])
-        smoking_history = st.selectbox("Smoking History", ['Yes', 'No'])
+        st.subheader("Make Predictions")
+        # You can add code here to make predictions using the trained models
 
-        gender = 1 if gender == 'Male' else 0
-        hypertension = 1 if hypertension == 'Yes' else 0
-        heart_disease = 1 if heart_disease == 'Yes' else 0
-        smoking_history = 1 if smoking_history == 'Yes' else 0
-
-        input_data = np.array([[age, bmi, hbA1c_level, blood_glucose_level, gender, hypertension, heart_disease, smoking_history]])
-        input_data_scaled = self.scaler.transform(input_data)
-
-        st.write("Predictions:")
-        st.write("Random Forest Classifier:", self.rf_clf.predict(input_data_scaled))
-        st.write("Extra Trees Classifier:", self.et_clf.predict(input_data_scaled))
-        st.write("LightGBM Classifier:", self.lgb_clf.predict(input_data_scaled))
-        st.write("Logistic Regression:", self.lr_clf.predict(input_data_scaled))
-        st.write("Combine Model of Random Forest and Extra Trees:", self.ensemble_clf_rf_et.predict(input_data_scaled))
-        
-        # Adding the target variable
-        st.write("Expected Outcome:")
-        expected_outcome = "Diabetes" if input("Do you have diabetes? ('Yes' or 'No') ").strip().lower() == 'yes' else "No Diabetes"
-        st.write(expected_outcome)
-        pass
 
 if __name__ == "__main__":
     app = DiabetesPredictionApp()
