@@ -263,7 +263,7 @@ class DiabetesPredictionApp:
         else:
             st.warning("Please train the models first.")
 
-    def make_predictions(self):
+    def predict(self):
         st.subheader("Make Predictions")
         st.write("Please input values for prediction:")
         age = st.number_input("Age", min_value=0, max_value=120, step=1)
@@ -274,15 +274,15 @@ class DiabetesPredictionApp:
         hypertension = st.selectbox("Hypertension", ['Yes', 'No'])
         heart_disease = st.selectbox("Heart Disease", ['Yes', 'No'])
         smoking_history = st.selectbox("Smoking History", ['Yes', 'No'])
-    
+
         gender = 1 if gender == 'Male' else 0
         hypertension = 1 if hypertension == 'Yes' else 0
         heart_disease = 1 if heart_disease == 'Yes' else 0
         smoking_history = 1 if smoking_history == 'Yes' else 0
-    
+
         input_data = np.array([[age, bmi, hbA1c_level, blood_glucose_level, gender, hypertension, heart_disease, smoking_history]])
         input_data_scaled = self.scaler.transform(input_data)
-    
+
         st.write("Predictions:")
         st.write("Random Forest Classifier:", self.rf_clf.predict(input_data_scaled))
         st.write("Extra Trees Classifier:", self.et_clf.predict(input_data_scaled))
@@ -294,6 +294,7 @@ class DiabetesPredictionApp:
         st.write("Expected Outcome:")
         expected_outcome = "Diabetes" if input("Do you have diabetes? ('Yes' or 'No') ").strip().lower() == 'yes' else "No Diabetes"
         st.write(expected_outcome)
+
         pass
 
 
