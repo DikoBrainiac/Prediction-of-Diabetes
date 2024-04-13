@@ -236,18 +236,22 @@ class DiabetesPredictionApp:
         pass
 
     def evaluate_models(self):
-        # Evaluate models
-        st.write("Evaluating Models...")
-        models = {
-            "Random Forest": self.rf_clf,
-            "Extra Trees": self.et_clf,
-            "LightGBM": self.lgb_clf,
-            "Logistic Regression": self.lr_clf,
-            "Ensemble (RF + ET)": self.ensemble_clf_rf_et
-        }
-        for name, model in models.items():
+        st.subheader("Model Evaluation")
+        selected_model = st.selectbox("Select Model for Evaluation", ["Random Forest", "Extra Trees", "LightGBM", "Logistic Regression", "Ensemble (RF + ET)"])
+        if selected_model == "Random Forest":
+            model = self.rf_clf
+        elif selected_model == "Extra Trees":
+            model = self.et_clf
+        elif selected_model == "LightGBM":
+            model = self.lgb_clf
+        elif selected_model == "Logistic Regression":
+            model = self.lr_clf
+        elif selected_model == "Ensemble (RF + ET)":
+            model = self.ensemble_clf_rf_et
+
+        if model:
             scores = cross_validate(model, self.X_test_scaled, self.y_test, cv=5, scoring=['accuracy', 'precision', 'recall', 'f1'])
-            st.write(f"Model: {name}")
+            st.write(f"Model: {selected_model}")
             st.write("Accuracy:", np.mean(scores['test_accuracy']))
             st.write("Precision:", np.mean(scores['test_precision']))
             st.write("Recall:", np.mean(scores['test_recall']))
@@ -256,10 +260,41 @@ class DiabetesPredictionApp:
             y_pred = model.predict(self.X_test_scaled)
             cm = confusion_matrix(self.y_test, y_pred)
             st.write(cm)
+        else:
+            st.warning("Please train the models first.")
 
-    def predict(self):
+    def make_predictions(self):
         st.subheader("Make Predictions")
-        # You can add code here to make predictions using the trained models
+        st.write("Please input values for prediction:")
+        age = st.number_input("Age", min_value=0, max_value=120, step=1)
+        bmi = st.number_input("BMI", min_value=0.0, max_value=60.0, step=0.1)
+        hbA1c_level = st.number_input("HbA1c Level", min_value=0.0, max_value=20.0, step=0.1)
+        blood_glucose_level = st.number_input("Blood Glucose Level", min_value=0.0, max_value=600.0, step=1.0)
+        gender = st.selectbox("Gender", ['Male', 'Female'])
+        hypertension = st.selectbox("Hypertension", ['Yes', 'No'])
+        heart_disease = st.selectbox("Heart Disease", ['Yes', 'No'])
+        smoking_history = st.selectbox("Smoking History", ['Yes', 'No'])
+    
+        gender = 1 if gender == 'Male' else 0
+        hypertension = 1 if hypertension == 'Yes' else 0
+        heart_disease = 1 if heart_disease == 'Yes' else 0
+        smoking_history = 1 if smoking_history == 'Yes' else 0
+    
+        input_data = np.array([[age, bmi, hbA1c_level, blood_glucose_level, gender, hypertension, heart_disease, smoking_history]])
+        input_data_scaled = self.scaler.transform(input_data)
+    
+        st.write("Predictions:")
+        st.write("Random Forest Classifier:", self.rf_clf.predict(input_data_scaled))
+        st.write("Extra Trees Classifier:", self.et_clf.predict(input_data_scaled))
+        st.write("LightGBM Classifier:", self.lgb_clf.predict(input_data_scaled))
+        st.write("Logistic Regression:", self.lr_clf.predict(input_data_scaled))
+        st.write("Combine Model of Random Forest and Extra Trees:", self.ensemble_clf_rf_et.predict(input_data_scaled))
+        
+        # Adding the target variable
+        st.write("Expected Outcome:")
+        expected_outcome = "Diabetes" if input("Do you have diabetes? ('Yes' or 'No') ").strip().lower() == 'yes' else "No Diabetes"
+        st.write(expected_outcome)
+        pass
 
 
 if __name__ == "__main__":
