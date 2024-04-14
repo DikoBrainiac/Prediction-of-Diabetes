@@ -11,7 +11,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 # Load the dataset
-@st.cache_data
+@st.cache
 def load_data():
     return pd.read_csv('diabetes_prediction_dataset.csv')
 
@@ -290,18 +290,3 @@ elif section == 'Make Predictions':
             st.write(f'The model prediction of diabetes: {prediction_result}')
     else:
         st.warning("Please train the model first before making predictions.")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
