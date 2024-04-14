@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, VotingClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split  # Importing train_test_split
@@ -33,6 +34,13 @@ def preprocess_data(df):
 
 # Model training
 def train_model(df):
+    # Initialize LabelEncoder
+    label_encoder = LabelEncoder()    
+    # Apply label encoding to each categorical column
+    for column in df.columns:
+        if df[column].dtype == 'object':  # Check if column is categorical
+            df[column] = label_encoder.fit_transform(df[column])
+            
     X = df.drop(['diabetes'], axis=1)
     y = df['diabetes']
     # Feature selection
