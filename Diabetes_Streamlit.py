@@ -160,8 +160,17 @@ elif section == 'Data Preprocessing':
     st.header('Data Preprocessing')
     df = load_data()
     
-    # Count missing values
+    # Count missing values before preprocessing
     missing_values_before = df.isnull().sum().sum()
+    
+    # Count duplicates before dropping
+    duplicate_rows_before = df[df.duplicated()].shape[0]
+    
+    # Drop duplicates
+    df.drop_duplicates(inplace=True)
+    
+    # Preprocess data
+    df = preprocess_data(df)
     
     # Count outliers before dropping
     outliers_before = {}
@@ -173,9 +182,6 @@ elif section == 'Data Preprocessing':
         upper_bound = Q3 + 1.5 * IQR
         num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
         outliers_before[column] = num_outliers
-    
-    # Preprocess data
-    df = preprocess_data(df)
     
     # Count missing values after preprocessing
     missing_values_after = df.isnull().sum().sum()
@@ -191,23 +197,15 @@ elif section == 'Data Preprocessing':
         num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
         outliers_after[column] = num_outliers
     
-    # Count duplicates before dropping
-    duplicate_rows_before = df[df.duplicated()].shape[0]
-    
-    # Drop duplicates
-    df.drop_duplicates(inplace=True)
-    
-    # Count duplicates after dropping
-    duplicate_rows_after = df[df.duplicated()].shape[0]
-    
     st.write('Data after preprocessing:')
     st.write(df.head())
     st.write('Number of missing values before preprocessing:', missing_values_before)
     st.write('Number of missing values after preprocessing:', missing_values_after)
+    st.write('Number of duplicates before preprocessing:', duplicate_rows_before)
+    st.write('Number of duplicates after preprocessing:', df[df.duplicated()].shape[0])
     st.write('Number of outliers before preprocessing:', outliers_before)
     st.write('Number of outliers after preprocessing:', outliers_after)
-    st.write('Number of duplicates before preprocessing:', duplicate_rows_before)
-    st.write('Number of duplicates after preprocessing:', duplicate_rows_after)
+
 
 
 elif section == 'Model Training':
