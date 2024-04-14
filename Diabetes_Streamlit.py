@@ -11,7 +11,7 @@ from imblearn.over_sampling import SMOTE
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
 # Load the dataset
-@st.cache
+@st.cache_data
 def load_data():
     return pd.read_csv('diabetes_prediction_dataset.csv')
 
