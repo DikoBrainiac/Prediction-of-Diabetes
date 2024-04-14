@@ -265,7 +265,7 @@ elif section == 'Make Predictions':
         for feature in selected_features:
             if feature == 'smoking_history':
                 selected_smoking_level = st.selectbox(f'Select {feature}', df[feature].unique())
-                input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
+                input_data[feature] = selected_smoking_level  # Store selected smoking level as category
             else:
                 min_value = 0.0  # Set min_value as float
                 max_value = None  # Set max_value as float
@@ -280,13 +280,18 @@ elif section == 'Make Predictions':
                 input_data[feature] = st.slider(f'Enter {feature}', min_value=min_value, max_value=max_value, step=0.01)
         
         if st.button('Predict'):
+            # Encode selected smoking level
+            input_data['smoking_history'] = label_encoder.transform([input_data['smoking_history']])[0]
+            
             # Prepare input data for prediction
             input_features = np.array([input_data[feature] for feature in selected_features])
             input_features = input_features.reshape(1, -1)  # Reshape for prediction
             
+            # Make prediction
             prediction_ensemble = predict_diabetes(model, input_features, scaler)
             prediction_result = 'There is diabetes' if prediction_ensemble[0] == 1 else 'No diabetes'
             st.write(f'The model prediction of diabetes: {prediction_result}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
