@@ -256,6 +256,7 @@ elif section == 'Model Training':
 
 elif section == 'Make Predictions':
     st.header('Make Predictions')
+    selected_features = train_model(df)
     input_data = {}
     for feature in selected_features:
         input_data[feature] = st.number_input(f'Enter {feature}', step=0.01)
