@@ -269,17 +269,30 @@ elif section == 'Make Predictions':
                 # Create one-hot encoding for selected smoking level
                 input_data.update({f'smoking_history_{level}': 1 if level == selected_smoking_level else 0 for level in smoking_levels})
             else:
-                min_value = 0 if feature in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level'] else None
+                if feature in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
+                    min_value = 0
+                else:
+                    min_value = None
                 input_data[feature] = st.number_input(f'Enter {feature}', min_value=min_value, step=0.01)
         
         if st.button('Predict'):
-            # Prepare input data for prediction
-            input_features = np.array([input_data[feature] for feature in selected_features if feature != 'smoking_history'])
-            smoking_features = np.array([input_data[f'smoking_history_{level}'] for level in smoking_levels])
-            input_features = np.concatenate((input_features, smoking_features), axis=0)
+            # Check if any numerical input is negative
+            invalid_input = False
+            for feature, value in input_data.items():
+                if isinstance(value, float) and value < 0:
+                    st.warning(f"Please enter a non-negative value for {feature}.")
+                    invalid_input = True
+                    break
             
-            prediction_ensemble = predict_diabetes(model, input_features, scaler)
-            st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
+            if not invalid_input:
+                # Prepare input data for prediction
+                input_features = np.array([input_data[feature] for feature in selected_features if feature != 'smoking_history'])
+                smoking_features = np.array([input_data[f'smoking_history_{level}'] for level in smoking_levels])
+                input_features = np.concatenate((input_features, smoking_features), axis=0)
+                
+                prediction_ensemble = predict_diabetes(model, input_features, scaler)
+                st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
