@@ -269,6 +269,7 @@ elif section == 'Make Predictions':
                 input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
             else:
                 max_value = max_values.get(feature, float('inf'))  # Get the maximum value for the feature
+                print(f"Feature: {feature}, Max Value: {max_value}")  # Debugging print statement
                 input_data[feature] = st.slider(f'Enter {feature}', min_value=0, max_value=max_value, step=0.01)
         
         if st.button('Predict'):
@@ -281,6 +282,7 @@ elif section == 'Make Predictions':
             st.write(f'The model prediction of diabetes: {prediction_result}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
 
 
