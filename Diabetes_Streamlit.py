@@ -262,22 +262,28 @@ elif section == 'Make Predictions':
     if selected_features is not None:  # Ensure selected_features is not None
         input_data = {}
         label_encoder = LabelEncoder()  # Initialize LabelEncoder for smoking_history
+        smoking_levels = ['No Info', 'never', 'former', 'current', 'not current', 'ever']
         for feature in selected_features:
             if feature == 'smoking_history':
-                selected_smoking_level = st.selectbox(f'Select {feature}', df[feature].unique())
-                input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
+                selected_smoking_level = st.selectbox(f'Select {feature}', smoking_levels)
+                encoded_smoking_level = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
+                input_data[feature] = encoded_smoking_level
             else:
                 input_data[feature] = st.number_input(f'Enter {feature}', step=0.01)
         
         if st.button('Predict'):
             # Prepare input data for prediction
-            input_features = np.array([input_data[feature] for feature in selected_features])
-            input_features = input_features.reshape(1, -1)  # Reshape for prediction
+            input_features = []
+            for feature in selected_features:
+                input_features.append(input_data[feature])
+                    
+            input_features = np.array(input_features).reshape(1, -1)
             
             prediction_ensemble = predict_diabetes(model, input_features, scaler)
             st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
 
 
