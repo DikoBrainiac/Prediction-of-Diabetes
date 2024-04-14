@@ -256,10 +256,15 @@ elif section == 'Model Training':
 
 elif section == 'Make Predictions':
     st.header('Make Predictions')
-    selected_features = train_model(df)
-    input_data = {}
-    for feature in selected_features:
-        input_data[feature] = st.number_input(f'Enter {feature}', step=0.01)
-    if st.button('Predict'):
-        prediction_ensemble = predict_diabetes(ensemble_rf_et, list(input_data.values()), scaler)
-        st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
+    df = load_data()
+    model, _, _, scaler, selected_features = train_model(df)  # Load the model and scaler
+
+    if selected_features is not None:  # Ensure selected_features is not None
+        input_data = {}
+        for feature in selected_features:
+            input_data[feature] = st.number_input(f'Enter {feature}', step=0.01)
+        if st.button('Predict'):
+            prediction_ensemble = predict_diabetes(model, list(input_data.values()), scaler)
+            st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
+    else:
+        st.warning("Please train the model first before making predictions.")
