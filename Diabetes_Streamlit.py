@@ -267,8 +267,7 @@ elif section == 'Make Predictions':
                 selected_smoking_level = st.selectbox(f'Select {feature}', df[feature].unique())
                 input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
             else:
-                min_value = 0 if feature in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level'] else None
-                input_data[feature] = st.number_input(f'Enter {feature}', min_value=min_value, step=0.01)
+                input_data[feature] = st.number_input(f'Enter {feature}', step=0.01)
         
         if st.button('Predict'):
             # Prepare input data for prediction
@@ -279,6 +278,7 @@ elif section == 'Make Predictions':
             st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
 
 
