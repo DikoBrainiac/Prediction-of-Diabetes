@@ -169,42 +169,30 @@ elif section == 'Data Preprocessing':
     # Drop duplicates
     df.drop_duplicates(inplace=True)
     
-    # Preprocess data
-    df = preprocess_data(df)
-    
-    # Count outliers before dropping
-    outliers_before = {}
+    # Remove outliers for all variables
     for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
         Q1 = np.percentile(df[column], 25)
         Q3 = np.percentile(df[column], 75)
         IQR = Q3 - Q1
         lower_bound = Q1 - 1.5 * IQR
         upper_bound = Q3 + 1.5 * IQR
-        num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
-        outliers_before[column] = num_outliers
+        df = df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+    
+    # Preprocess data
+    df = preprocess_data(df)
     
     # Count missing values after preprocessing
     missing_values_after = df.isnull().sum().sum()
     
-    # Count outliers after dropping
-    outliers_after = {}
-    for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
-        Q1 = np.percentile(df[column], 25)
-        Q3 = np.percentile(df[column], 75)
-        IQR = Q3 - Q1
-        lower_bound = Q1 - 1.5 * IQR
-        upper_bound = Q3 + 1.5 * IQR
-        num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
-        outliers_after[column] = num_outliers
+    # Count duplicates after dropping
+    duplicate_rows_after = df[df.duplicated()].shape[0]
     
     st.write('Data after preprocessing:')
     st.write(df.head())
     st.write('Number of missing values before preprocessing:', missing_values_before)
     st.write('Number of missing values after preprocessing:', missing_values_after)
     st.write('Number of duplicates before preprocessing:', duplicate_rows_before)
-    st.write('Number of duplicates after preprocessing:', df[df.duplicated()].shape[0])
-    st.write('Number of outliers before preprocessing:', outliers_before)
-    st.write('Number of outliers after preprocessing:', outliers_after)
+    st.write('Number of duplicates after preprocessing:', duplicate_rows_after)
 
 
 
