@@ -275,7 +275,7 @@ elif section == 'Make Predictions':
                     max_value = 10
                 elif feature == 'blood_glucose_level':
                     max_value = 300
-                input_data[feature] = st.slider(f'Enter {feature}', min_value=0, max_value=max_value, step=0.01)
+                input_data[feature] = st.slider(f'Enter {feature}', min_value=0, max_value=int(max_value), step=0.01)
         
         if st.button('Predict'):
             # Prepare input data for prediction
@@ -287,5 +287,15 @@ elif section == 'Make Predictions':
             st.write(f'The model prediction of diabetes: {prediction_result}')
     else:
         st.warning("Please train the model first before making predictions.")
+
+
+
+
+
+
+
+
+
+
 
 
