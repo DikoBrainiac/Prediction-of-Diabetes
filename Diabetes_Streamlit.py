@@ -261,38 +261,24 @@ elif section == 'Make Predictions':
 
     if selected_features is not None:  # Ensure selected_features is not None
         input_data = {}
+        label_encoder = LabelEncoder()  # Initialize LabelEncoder for smoking_history
         for feature in selected_features:
             if feature == 'smoking_history':
-                # Handle categorical variable 'smoking_history' with one-hot encoding
-                smoking_levels = ['No Info', 'never', 'former', 'current', 'not current', 'ever']
-                selected_smoking_level = st.selectbox(f'Select {feature}', smoking_levels)
-                # Create one-hot encoding for selected smoking level
-                input_data.update({f'smoking_history_{level}': 1 if level == selected_smoking_level else 0 for level in smoking_levels})
+                selected_smoking_level = st.selectbox(f'Select {feature}', df[feature].unique())
+                input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
             else:
-                if feature in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
-                    min_value = 0
-                else:
-                    min_value = None
+                min_value = 0 if feature in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level'] else None
                 input_data[feature] = st.number_input(f'Enter {feature}', min_value=min_value, step=0.01)
         
         if st.button('Predict'):
-            # Check if any numerical input is negative
-            invalid_input = False
-            for feature, value in input_data.items():
-                if isinstance(value, float) and value < 0:
-                    st.warning(f"Please enter a non-negative value for {feature}.")
-                    invalid_input = True
-                    break
+            # Prepare input data for prediction
+            input_features = np.array([input_data[feature] for feature in selected_features])
+            input_features = input_features.reshape(1, -1)  # Reshape for prediction
             
-            if not invalid_input:
-                # Prepare input data for prediction
-                input_features = np.array([input_data[feature] for feature in selected_features if feature != 'smoking_history'])
-                smoking_features = np.array([input_data[f'smoking_history_{level}'] for level in smoking_levels])
-                input_features = np.concatenate((input_features, smoking_features), axis=0)
-                
-                prediction_ensemble = predict_diabetes(model, input_features, scaler)
-                st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
+            prediction_ensemble = predict_diabetes(model, input_features, scaler)
+            st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
 
