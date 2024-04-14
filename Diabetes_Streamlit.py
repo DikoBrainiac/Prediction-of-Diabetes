@@ -215,10 +215,6 @@ elif section == 'Data Preprocessing':
     st.write('Number of missing values after preprocessing:', missing_values_after)
     st.write('Number of duplicates before preprocessing:', duplicate_rows_before)
     st.write('Number of duplicates after preprocessing:', duplicate_rows_after)
-    st.write('Number of outliers before preprocessing:', outliers_before)
-    st.write('Number of outliers after preprocessing:', outliers_after)
-
-
 
 
 elif section == 'Model Training':
