@@ -44,3 +44,6 @@ The following Python libraries are required to run the app:
 ### Author
 
 [DikoBrainiac](https://github.com/DikoBrainiac)
+
+
+I added a comment
