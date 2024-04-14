@@ -280,9 +280,13 @@ elif section == 'Make Predictions':
             input_features = np.array(input_features).reshape(1, -1)
             
             prediction_ensemble = predict_diabetes(model, input_features, scaler)
-            st.write(f'Prediction using Ensemble Model (Random Forest + Extra Trees): {prediction_ensemble[0]}')
+            if prediction_ensemble[0] == 0:
+                st.write('The model prediction of diabetes: No diabetes')
+            else:
+                st.write('The model prediction of diabetes: There is diabetes')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
 
 
