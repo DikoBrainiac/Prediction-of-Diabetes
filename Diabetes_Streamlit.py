@@ -34,6 +34,20 @@ def preprocess_data(df):
 
 # Model training
 def train_model(df):
+    # Drop missing values
+    df.dropna(inplace=True)
+    # Remove duplicates
+    df.drop_duplicates(inplace=True)
+    # Remove outliers
+    numeric_columns = ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']
+    for column in numeric_columns:
+        Q1 = df[column].quantile(0.25)
+        Q3 = df[column].quantile(0.75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        df = df[(df[column] >= lower_bound) & (df[column] <= upper_bound)]
+        
     # Initialize LabelEncoder
     label_encoder = LabelEncoder()    
     # Apply label encoding to each categorical column
