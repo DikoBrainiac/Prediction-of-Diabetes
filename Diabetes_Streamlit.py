@@ -100,15 +100,15 @@ def train_model(df):
     rf_model = RandomForestClassifier(**params_rf)
     et_model = ExtraTreesClassifier(**params_et)
     ensemble_rf_et = VotingClassifier(estimators=[('rf', rf_model), ('et', et_model)], voting='hard')
-    # Perform cross-validation with the ensemble classifier
-    scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
-    ensemble_rf_et_score = cross_validate(ensemble_rf_et, X=X_train_scaled, y=y_train_res, cv=10, scoring=scoring, return_train_score=False)
-    # Compute the mean scores
-    mean_scores = {metric: np.mean(ensemble_rf_et_score[f'test_{metric}']) for metric in scoring}
-    # Print mean scores
-    print("Mean Scores:")
-    for metric, score in mean_scores.items():
-        print(f"{metric}: {score:.4f}")
+    # # Perform cross-validation with the ensemble classifier
+    # scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+    # ensemble_rf_et_score = cross_validate(ensemble_rf_et, X=X_train_scaled, y=y_train_res, cv=10, scoring=scoring, return_train_score=False)
+    # # Compute the mean scores
+    # mean_scores = {metric: np.mean(ensemble_rf_et_score[f'test_{metric}']) for metric in scoring}
+    # # Print mean scores
+    # print("Mean Scores:")
+    # for metric, score in mean_scores.items():
+    #     print(f"{metric}: {score:.4f}")
     # Fit the ensemble model on the entire training set
     ensemble_rf_et.fit(X_train_scaled, y_train_res)
     return ensemble_rf_et, X_test_scaled, y_test, scaler, selected_features
@@ -238,7 +238,8 @@ elif section == 'Data Preprocessing':
 
 elif section == 'Model Training':
     st.header('Model Training with Cross-Validation')
-    ensemble_rf_et, X_test_scaled, y_test, scaler, selected_features = train_model(load_data())
+    df = load_data()
+    ensemble_rf_et, X_test_scaled, y_test, scaler, selected_features = train_model(df)
     st.success('Model trained successfully!')
 
     # Model metrics
@@ -255,16 +256,15 @@ elif section == 'Model Training':
     st.write(f'F1 Score: {f1:.2f}')
     st.write(f'AUC: {auc:.2f}')
 
-    # Perform cross-validation with the ensemble classifier
-    scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
-    ensemble_rf_et_score = cross_validate(ensemble_rf_et, X=X_test_scaled, y=y_test, cv=10, scoring=scoring, return_train_score=False)
+    # # Perform cross-validation with the ensemble classifier
+    # scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
+    # ensemble_rf_et_score = cross_validate(ensemble_rf_et, X=X_train_scaled, y=y_train_res, cv=10, scoring=scoring, return_train_score=False)
 
-    # Compute and print mean scores
-    mean_scores = {metric: np.mean(ensemble_rf_et_score[f'test_{metric}']) for metric in scoring}
-    st.write('Mean Scores:')
-    for metric, score in mean_scores.items():
-        st.write(f'{metric}: {score:.4f}')
-
+    # # Compute and print mean scores
+    # mean_scores = {metric: np.mean(ensemble_rf_et_score[f'test_{metric}']) for metric in scoring}
+    # st.write('Mean Scores:')
+    # for metric, score in mean_scores.items():
+    #     st.write(f'{metric}: {score:.4f}')
 
     # Confusion matrix visualization
     cm = confusion_matrix(y_test, y_pred)
@@ -273,6 +273,7 @@ elif section == 'Model Training':
     plt.xlabel('Predicted labels')
     plt.ylabel('True labels')
     st.pyplot()
+
 
 elif section == 'Make Predictions':
     st.header('Make Predictions')
