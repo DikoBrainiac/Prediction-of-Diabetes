@@ -267,17 +267,16 @@ elif section == 'Make Predictions':
                 selected_smoking_level = st.selectbox(f'Select {feature}', df[feature].unique())
                 input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
             else:
-                min_value = 0
-                max_value = None
+                min_value = 0.0  # Set min_value as float
+                max_value = None  # Set max_value as float
                 if feature == 'age':
-                    max_value = 100
+                    max_value = 100.0  # Set max_value as float
                 elif feature == 'bmi':
-                    max_value = 100
+                    max_value = 100.0  # Set max_value as float
                 elif feature == 'HbA1c_level':
-                    max_value = 10
+                    max_value = 10.0  # Set max_value as float
                 elif feature == 'blood_glucose_level':
-                    max_value = 300
-                print(f"Feature: {feature}, Min Value: {min_value}, Max Value: {max_value}")  # Debugging print statement
+                    max_value = 300.0  # Set max_value as float
                 input_data[feature] = st.slider(f'Enter {feature}', min_value=min_value, max_value=max_value, step=0.01)
         
         if st.button('Predict'):
@@ -290,3 +289,4 @@ elif section == 'Make Predictions':
             st.write(f'The model prediction of diabetes: {prediction_result}')
     else:
         st.warning("Please train the model first before making predictions.")
+
