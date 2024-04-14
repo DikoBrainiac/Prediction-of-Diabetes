@@ -237,11 +237,10 @@ elif section == 'Data Preprocessing':
 
 
 elif section == 'Model Training':
-    st.header('Model Training')
+    st.header('Model Training with Cross-Validation')
     ensemble_rf_et, X_test_scaled, y_test, scaler, selected_features = train_model(load_data())
-    st.success('Models trained successfully!')
+    st.success('Model trained successfully!')
 
-    
     # Model metrics
     y_pred = ensemble_rf_et.predict(X_test_scaled)
     accuracy = accuracy_score(y_test, y_pred)
@@ -256,9 +255,11 @@ elif section == 'Model Training':
     st.write(f'F1 Score: {f1:.2f}')
     st.write(f'AUC: {auc:.2f}')
 
-    # Compute and print mean scores
+    # Perform cross-validation with the ensemble classifier
     scoring = ['accuracy', 'precision', 'recall', 'f1', 'roc_auc']
     ensemble_rf_et_score = cross_validate(ensemble_rf_et, X=X_test_scaled, y=y_test, cv=10, scoring=scoring, return_train_score=False)
+
+    # Compute and print mean scores
     mean_scores = {metric: np.mean(ensemble_rf_et_score[f'test_{metric}']) for metric in scoring}
     st.write('Mean Scores:')
     for metric, score in mean_scores.items():
