@@ -262,20 +262,14 @@ elif section == 'Make Predictions':
     if selected_features is not None:  # Ensure selected_features is not None
         input_data = {}
         label_encoder = LabelEncoder()  # Initialize LabelEncoder for smoking_history
+        max_values = {'age': 100, 'bmi': 100, 'HbA1c_level': 10, 'blood_glucose_level': 300}
         for feature in selected_features:
             if feature == 'smoking_history':
                 selected_smoking_level = st.selectbox(f'Select {feature}', df[feature].unique())
                 input_data[feature] = label_encoder.fit_transform([selected_smoking_level])[0]  # Encode selected smoking level
             else:
-                if feature == 'age':
-                    max_value = 100
-                elif feature == 'bmi':
-                    max_value = 100
-                elif feature == 'HbA1c_level':
-                    max_value = 10
-                elif feature == 'blood_glucose_level':
-                    max_value = 300
-                input_data[feature] = st.slider(f'Enter {feature}', min_value=0, max_value=int(max_value), step=0.01)
+                max_value = max_values.get(feature, float('inf'))  # Get the maximum value for the feature
+                input_data[feature] = st.slider(f'Enter {feature}', min_value=0, max_value=max_value, step=0.01)
         
         if st.button('Predict'):
             # Prepare input data for prediction
@@ -287,6 +281,7 @@ elif section == 'Make Predictions':
             st.write(f'The model prediction of diabetes: {prediction_result}')
     else:
         st.warning("Please train the model first before making predictions.")
+
 
 
 
