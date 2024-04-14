@@ -118,38 +118,97 @@ elif section == 'Data Summary':
     st.subheader('Numeric Columns Summary')
     st.write(df.describe())
     st.subheader('Categorical Columns Summary')
-    for column in df.select_dtypes(include='object').columns:
-        if column not in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
-            st.write(f'Value counts for column: {column}')
-            st.write(df[column].value_counts())
+    categorical_columns = [column for column in df.columns if column not in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']]
+    for column in categorical_columns:
+        st.write(f'Value counts for column: {column}')
+        st.write(df[column].value_counts())
 
 elif section == 'Data Visualization':
     st.header('Data Visualization')
     df = load_data()
     numeric_columns = ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']
-    selected_variable = st.selectbox('Select a variable', numeric_columns)
+    selected_variable = st.selectbox('Select a variable', df.columns)
+    
     if selected_variable:
-        if st.checkbox('Histogram'):
-            plt.figure(figsize=(8, 6))
-            plt.hist(df[selected_variable], bins=20, color='skyblue', edgecolor='black')
-            plt.title(f'Histogram of {selected_variable}')
-            plt.xlabel(selected_variable)
-            plt.ylabel('Frequency')
-            plt.grid(True)
-            st.pyplot()
-        if st.checkbox('Boxplot'):
-            plt.figure(figsize=(8, 6))
-            sns.boxplot(data=df[selected_variable])
-            plt.title(f'Boxplot of {selected_variable}')
-            plt.grid(True)
-            st.pyplot()
+        if selected_variable in numeric_columns:
+            if st.checkbox('Histogram'):
+                plt.figure(figsize=(8, 6))
+                plt.hist(df[selected_variable], bins=20, color='skyblue', edgecolor='black')
+                plt.title(f'Histogram of {selected_variable}')
+                plt.xlabel(selected_variable)
+                plt.ylabel('Frequency')
+                plt.grid(True)
+                st.pyplot()
+            if st.checkbox('Boxplot'):
+                plt.figure(figsize=(8, 6))
+                sns.boxplot(data=df[selected_variable])
+                plt.title(f'Boxplot of {selected_variable}')
+                plt.grid(True)
+                st.pyplot()
+        else:
+            if st.checkbox('Bar Plot'):
+                plt.figure(figsize=(8, 6))
+                sns.countplot(data=df, x=selected_variable)
+                plt.title(f'Bar Plot of {selected_variable}')
+                plt.xlabel(selected_variable)
+                plt.ylabel('Count')
+                plt.xticks(rotation=45)
+                st.pyplot()
+
 
 elif section == 'Data Preprocessing':
     st.header('Data Preprocessing')
     df = load_data()
+    
+    # Count missing values
+    missing_values_before = df.isnull().sum().sum()
+    
+    # Count outliers before dropping
+    outliers_before = {}
+    for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
+        Q1 = np.percentile(df[column], 25)
+        Q3 = np.percentile(df[column], 75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
+        outliers_before[column] = num_outliers
+    
+    # Preprocess data
     df = preprocess_data(df)
+    
+    # Count missing values after preprocessing
+    missing_values_after = df.isnull().sum().sum()
+    
+    # Count outliers after dropping
+    outliers_after = {}
+    for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
+        Q1 = np.percentile(df[column], 25)
+        Q3 = np.percentile(df[column], 75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
+        outliers_after[column] = num_outliers
+    
+    # Count duplicates before dropping
+    duplicate_rows_before = df[df.duplicated()].shape[0]
+    
+    # Drop duplicates
+    df.drop_duplicates(inplace=True)
+    
+    # Count duplicates after dropping
+    duplicate_rows_after = df[df.duplicated()].shape[0]
+    
     st.write('Data after preprocessing:')
     st.write(df.head())
+    st.write('Number of missing values before preprocessing:', missing_values_before)
+    st.write('Number of missing values after preprocessing:', missing_values_after)
+    st.write('Number of outliers before preprocessing:', outliers_before)
+    st.write('Number of outliers after preprocessing:', outliers_after)
+    st.write('Number of duplicates before preprocessing:', duplicate_rows_before)
+    st.write('Number of duplicates after preprocessing:', duplicate_rows_after)
+
 
 elif section == 'Model Training':
     st.header('Model Training')
