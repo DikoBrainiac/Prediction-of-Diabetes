@@ -169,6 +169,17 @@ elif section == 'Data Preprocessing':
     # Drop duplicates
     df.drop_duplicates(inplace=True)
     
+    # Count outliers before preprocessing
+    outliers_before = {}
+    for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
+        Q1 = np.percentile(df[column], 25)
+        Q3 = np.percentile(df[column], 75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
+        outliers_before[column] = num_outliers
+    
     # Remove outliers for all variables
     for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
         Q1 = np.percentile(df[column], 25)
@@ -187,12 +198,26 @@ elif section == 'Data Preprocessing':
     # Count duplicates after dropping
     duplicate_rows_after = df[df.duplicated()].shape[0]
     
+    # Count outliers after preprocessing
+    outliers_after = {}
+    for column in ['age', 'bmi', 'HbA1c_level', 'blood_glucose_level']:
+        Q1 = np.percentile(df[column], 25)
+        Q3 = np.percentile(df[column], 75)
+        IQR = Q3 - Q1
+        lower_bound = Q1 - 1.5 * IQR
+        upper_bound = Q3 + 1.5 * IQR
+        num_outliers = np.sum((df[column] < lower_bound) | (df[column] > upper_bound))
+        outliers_after[column] = num_outliers
+    
     st.write('Data after preprocessing:')
     st.write(df.head())
     st.write('Number of missing values before preprocessing:', missing_values_before)
     st.write('Number of missing values after preprocessing:', missing_values_after)
     st.write('Number of duplicates before preprocessing:', duplicate_rows_before)
     st.write('Number of duplicates after preprocessing:', duplicate_rows_after)
+    st.write('Number of outliers before preprocessing:', outliers_before)
+    st.write('Number of outliers after preprocessing:', outliers_after)
+
 
 
 
