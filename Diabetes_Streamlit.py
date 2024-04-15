@@ -292,5 +292,10 @@ elif section == 'Make Predictions':
     else:
         st.warning("Please train the model first before making predictions.")
 
+elif section == 'About Me':
+    st.header('About Me')
+    st.write("Name: Musa Diko")
+    st.write("Github: [https://github.com/DikoBrainiac](https://github.com/DikoBrainiac)")
+    st.write("LinkedIn: [www.linkedin.com/in/musa-diko-a996a0165](www.linkedin.com/in/musa-diko-a996a0165)")
 
 
