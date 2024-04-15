@@ -226,7 +226,7 @@ elif section == 'Data Preprocessing':
 
 
 elif section == 'Model Training':
-    st.header('Model Training with Cross-Validation')
+    st.header('Model Training')
     df = load_data()
     ensemble_rf_et, X_test_scaled, y_test, scaler, selected_features = train_model(df)
     st.success('Model trained successfully!')
