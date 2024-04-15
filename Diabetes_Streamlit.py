@@ -110,7 +110,7 @@ def predict_diabetes(model, input_data, scaler):
 
 # Sidebar
 st.sidebar.title('Navigation')
-section = st.sidebar.radio('Go to', ('View Dataset', 'Data Summary', 'Data Visualization', 'Data Preprocessing', 'Model Training', 'Make Predictions'))
+section = st.sidebar.radio('Go to', ('View Dataset', 'Data Summary', 'Data Visualization', 'Data Preprocessing', 'Model Training', 'Make Predictions', 'About Me'))
 
 # Main content
 st.title('Diabetes Prediction App')
@@ -297,5 +297,4 @@ elif section == 'About Me':
     st.write("Name: Musa Diko")
     st.write("Github: [https://github.com/DikoBrainiac](https://github.com/DikoBrainiac)")
     st.write("LinkedIn: [www.linkedin.com/in/musa-diko-a996a0165](www.linkedin.com/in/musa-diko-a996a0165)")
-
 
