@@ -10,6 +10,8 @@ from sklearn.model_selection import train_test_split  # Importing train_test_spl
 from imblearn.over_sampling import SMOTE
 from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 
+st.set_option('deprecation.showPyplotGlobalUse', False)
+
 # Load the dataset
 @st.cache_data
 def load_data():
