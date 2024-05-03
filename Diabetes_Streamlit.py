@@ -115,7 +115,7 @@ st.sidebar.title('Navigation')
 section = st.sidebar.radio('Go to', ('View Dataset', 'Data Summary', 'Data Visualization', 'Data Preprocessing', 'Model Training', 'Make Predictions', 'About Me'))
 
 # Main content
-st.title('Diabetes Prediction App')
+st.title('Diko's Diabetes Prediction App')
 
 if section == 'View Dataset':
     st.header('Dataset')
